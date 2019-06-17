@@ -1,4 +1,4 @@
-package core;
+package core.pagerank;
 
 import java.awt.Color;
 import java.awt.Dimension;

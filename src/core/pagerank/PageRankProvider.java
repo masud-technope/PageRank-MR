@@ -1,4 +1,4 @@
-package core;
+package core.pagerank;
 
 import java.util.HashMap;
 import java.util.Set;
