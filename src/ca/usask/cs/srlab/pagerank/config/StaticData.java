@@ -2,8 +2,12 @@ package ca.usask.cs.srlab.pagerank.config;
 
 public interface StaticData {
 
-	// public final attributes
-
+	// public attributes used by PageRank
+	/***
+	 * attributes are taken from Mihalcea et al. 
+	 * 
+	 */
+	
 	public static double SIGNIFICANCE_THRESHOLD = 0.0001;
 	public final static int WINDOW_SIZE = 2;
 

@@ -19,8 +19,7 @@ public class PageRankProvider {
 	final double DAMPING_FACTOR = StaticData.DAMPING_FACTOR;
 	final int MAX_ITERATION = StaticData.MAX_ITERATION;
 
-	public PageRankProvider(
-			SimpleDirectedWeightedGraph<String, DefaultWeightedEdge> wgraph,
+	public PageRankProvider(SimpleDirectedWeightedGraph<String, DefaultWeightedEdge> wgraph,
 			HashMap<String, Double> tokendb) {
 		// initialization of different objects
 		// weighted graph constructor
@@ -30,8 +29,7 @@ public class PageRankProvider {
 		this.newScoreMap = new HashMap<>();
 	}
 
-	public PageRankProvider(DirectedGraph<String, DefaultEdge> graph,
-			HashMap<String, Double> tokendb) {
+	public PageRankProvider(DirectedGraph<String, DefaultEdge> graph, HashMap<String, Double> tokendb) {
 		// un-weighted graph constructor
 		this.graph = graph;
 		this.tokendb = tokendb;
@@ -48,7 +46,7 @@ public class PageRankProvider {
 		return diff > StaticData.SIGNIFICANCE_THRESHOLD ? true : false;
 	}
 
-	public HashMap<String, Double> calculatePageRankWeighted() {
+	public HashMap<String, Double> calculatePageRankWeighted(boolean normalize) {
 		// calculating token rank score
 		double d = this.DAMPING_FACTOR;
 		double N = wgraph.vertexSet().size();
@@ -63,8 +61,7 @@ public class PageRankProvider {
 		while (!enoughIteration) {
 			int insignificant = 0;
 			for (String vertex : wgraph.vertexSet()) {
-				Set<DefaultWeightedEdge> incomings = wgraph
-						.incomingEdgesOf(vertex);
+				Set<DefaultWeightedEdge> incomings = wgraph.incomingEdgesOf(vertex);
 				// now calculate the PR score
 				double trank = (1 - d);
 				double comingScore = 0;
@@ -77,7 +74,7 @@ public class PageRankProvider {
 					double edgeWeight = wgraph.getEdgeWeight(edge);
 					// edgeWeight=1; //by default 1.0
 					score = score * edgeWeight;
-					
+
 					if (outdegree == 0)
 						comingScore += score;
 					else
@@ -85,8 +82,7 @@ public class PageRankProvider {
 				}
 				comingScore = comingScore * d;
 				trank += comingScore;
-				boolean significant = checkSignificantDiff(
-						oldScoreMap.get(vertex).doubleValue(), trank);
+				boolean significant = checkSignificantDiff(oldScoreMap.get(vertex).doubleValue(), trank);
 				if (significant) {
 					newScoreMap.put(vertex, trank);
 				} else {
@@ -105,7 +101,11 @@ public class PageRankProvider {
 		}
 		System.out.println("Iter count:" + itercount);
 		// saving token ranks
-		recordNormalizeScores();
+		if (normalize) {
+			recordNormalizedScores();
+		} else {
+			recordOriginalScores();
+		}
 		// sort the token rank scores
 		// this.tokendb = MyItemSorter.sortItemMap(this.tokendb);
 		// showing token rank scores
@@ -113,7 +113,7 @@ public class PageRankProvider {
 		return this.tokendb;
 	}
 
-	public HashMap<String, Double> calculatePageRank() {
+	public HashMap<String, Double> calculatePageRank(boolean normalize) {
 		// calculating token rank score
 		double d = this.DAMPING_FACTOR;
 		double N = graph.vertexSet().size();
@@ -148,8 +148,7 @@ public class PageRankProvider {
 				}
 				comingScore = comingScore * d;
 				trank += comingScore;
-				boolean significant = checkSignificantDiff(
-						oldScoreMap.get(vertex).doubleValue(), trank);
+				boolean significant = checkSignificantDiff(oldScoreMap.get(vertex).doubleValue(), trank);
 				if (significant) {
 					newScoreMap.put(vertex, trank);
 				} else {
@@ -168,12 +167,22 @@ public class PageRankProvider {
 		}
 
 		// saving token ranks
-		recordNormalizeScores();
-
+		if (normalize) {
+			recordNormalizedScores();
+		} else {
+			recordOriginalScores();
+		}
 		return this.tokendb;
 	}
 
-	protected void recordNormalizeScores() {
+	protected void recordOriginalScores() {
+		for (String key : newScoreMap.keySet()) {
+			double score = newScoreMap.get(key).doubleValue();
+			tokendb.put(key, score);
+		}
+	}
+
+	protected void recordNormalizedScores() {
 		// record normalized scores
 		double maxRank = 0;
 		for (String key : newScoreMap.keySet()) {

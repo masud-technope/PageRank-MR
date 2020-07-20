@@ -2,7 +2,6 @@ package core.pagerank;
 
 import java.util.HashMap;
 import java.util.HashSet;
-
 import org.jgraph.graph.DefaultEdge;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
@@ -15,7 +14,7 @@ public class PageRankProviderMgr {
 		this.graph = graph;
 	}
 
-	public HashMap<String, Double> getPageRanks() {
+	public HashMap<String, Double> getPageRanks(boolean normalize) {
 		if (this.graph != null) {
 			HashSet<String> vertices = new HashSet<>(this.graph.vertexSet());
 			HashMap<String, Double> tokendb = new HashMap<>();
@@ -24,7 +23,7 @@ public class PageRankProviderMgr {
 			}
 			// now get the pageRank
 			PageRankProvider prProvider = new PageRankProvider(graph, tokendb);
-			return prProvider.calculatePageRank();
+			return prProvider.calculatePageRank(normalize);
 		}
 		return null;
 
@@ -46,7 +45,9 @@ public class PageRankProviderMgr {
 		graph.addEdge("3", "2");
 		graph.addEdge("4", "3");
 		
-		HashMap<String,Double> tokendb=new PageRankProviderMgr(graph).getPageRanks();
+		boolean normalizeScore=false;
+		
+		HashMap<String,Double> tokendb=new PageRankProviderMgr(graph).getPageRanks(normalizeScore);
 		System.out.println(tokendb);
 	}
 }
